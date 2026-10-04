@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Bike, LogOut, Star, ThumbsDown, ThumbsUp, Wrench } from "lucide-react";
+import { Bike, Check, CheckCheck, LogOut, Star, ThumbsDown, ThumbsUp, Wrench } from "lucide-react";
 import StatusBadge from "@/components/StatusBadge";
 import { isAdmin } from "@/lib/admin";
 import { adminLogout, adminUpdateBooking, adminUpdateService } from "@/lib/actions";
@@ -45,7 +45,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
       <div className="mt-8 flex gap-2 border-b border-line">
         {[
           ["bookings", `Bookings (${bookings.length})`],
-          ["services", `Services (${services.length})`],
+          ["services", `Services (${services.length})${services.some((x) => x.status === "Requested") ? ` · ${services.filter((x) => x.status === "Requested").length} new` : ""}`],
           ["feedback", `Feedback (${rated.length})`],
         ].map(([id, label]) => (
           <Link
@@ -71,6 +71,15 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                 <p className="mt-2 font-display text-xl font-bold text-white">{getBike(b.bike_id)?.name} · {b.color}</p>
                 <p className="text-sm text-gray-400">{b.name} · {b.phone} · {b.email}</p>
                 <p className="text-sm text-gray-400">{b.address}, {b.city} · {b.showroom}</p>
+                {b.status !== "Delivered" && (
+                  <form action={adminUpdateBooking} className="mt-4">
+                    <input type="hidden" name="id" value={b.id} />
+                    <input type="hidden" name="status" value={BOOKING_STATUSES[BOOKING_STATUSES.indexOf(b.status as (typeof BOOKING_STATUSES)[number]) + 1]} />
+                    <button className="btn bg-emerald-600 text-white hover:bg-emerald-500">
+                      <Check size={18} /> {b.status === "Booked" ? "Accept booking" : `Mark as ${BOOKING_STATUSES[BOOKING_STATUSES.indexOf(b.status as (typeof BOOKING_STATUSES)[number]) + 1]}`}
+                    </button>
+                  </form>
+                )}
               </div>
               <form action={adminUpdateBooking} className="grid gap-2 sm:grid-cols-2">
                 <input type="hidden" name="id" value={b.id} />
@@ -103,6 +112,24 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                 </p>
                 <p className="text-sm text-gray-400">{s.name} · {s.phone}</p>
                 {s.notes && <p className="mt-1 text-sm italic text-gray-500">“{s.notes}”</p>}
+                {s.status !== "Completed" && (
+                  <form action={adminUpdateService} className="mt-4">
+                    <input type="hidden" name="id" value={s.id} />
+                    {s.status === "Requested" ? (
+                      <>
+                        <input type="hidden" name="status" value="In Progress" />
+                        <input type="hidden" name="note" value="Request accepted. Technician assigned." />
+                        <button className="btn bg-emerald-600 text-white hover:bg-emerald-500"><Check size={18} /> Accept request</button>
+                      </>
+                    ) : (
+                      <>
+                        <input type="hidden" name="status" value="Completed" />
+                        <input type="hidden" name="note" value="Service completed. Your bike is ready!" />
+                        <button className="btn bg-emerald-600 text-white hover:bg-emerald-500"><CheckCheck size={18} /> Mark as Done</button>
+                      </>
+                    )}
+                  </form>
+                )}
               </div>
               <form action={adminUpdateService} className="grid gap-2 sm:grid-cols-2">
                 <input type="hidden" name="id" value={s.id} />
