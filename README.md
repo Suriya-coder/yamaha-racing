@@ -33,6 +33,17 @@ After step 4 it works **offline**. All bookings/services are saved in `data/yama
 Admin → **Services** tab → **Accept request** (status becomes *In Progress*) → **Mark as Done** (status *Completed*,
 customer is asked to rate the service). Bookings work the same way with **Accept booking** → next status buttons.
 
+## Put it online (public link for phones)
+1. Push this folder to a GitHub repository.
+2. On https://vercel.com → **Add New → Project** → import the repository → **Deploy**.
+3. Create a free database: Vercel project → **Storage** → **Turso** (or https://turso.tech) and add these
+   **Environment Variables** in Vercel (see `.env.example`):
+   - `TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN` — the online database
+   - `ADMIN_PASSWORD` — a strong password for `/admin` (don't use the demo one online)
+4. **Redeploy**. Share the `*.vercel.app` link — anyone can open it on a phone and book.
+
+Without `TURSO_DATABASE_URL` the site uses the local file `data/yamaha.db`, so running on your laptop still works offline.
+
 ## Where things live
 - `src/app/` — pages (each folder is a URL)
 - `src/lib/bikes.ts` — bike catalogue, showrooms, service prices

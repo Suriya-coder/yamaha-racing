@@ -15,15 +15,15 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
       <div className="mx-auto max-w-md px-4 py-24">
         <div className="card glow p-8">
           <h1 className="font-display text-3xl font-bold text-white">Showroom Admin</h1>
-          <p className="mb-6 mt-1 text-sm text-gray-400">Staff only. Demo password: <code className="text-volt">yamaha123</code></p>
+          <p className="mb-6 mt-1 text-sm text-gray-400">Staff only.{!process.env.ADMIN_PASSWORD && <> Demo password: <code className="text-volt">yamaha123</code></>}</p>
           <LoginForm />
         </div>
       </div>
     );
   }
   const { tab = "bookings" } = await searchParams;
-  const bookings = listBookings();
-  const services = listServices();
+  const bookings = await listBookings();
+  const services = await listServices();
   const rated = services.filter((s) => s.rating);
   const avg = rated.length ? (rated.reduce((a, s) => a + (s.rating ?? 0), 0) / rated.length).toFixed(1) : "-";
   const likes = rated.filter((s) => s.liked).length;

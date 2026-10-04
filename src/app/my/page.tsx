@@ -20,8 +20,8 @@ export default async function MyGarage({ searchParams }: { searchParams: Promise
       </div>
     );
   }
-  const bookings = bookingsByPhone(phone);
-  const services = servicesByPhone(phone);
+  const bookings = await bookingsByPhone(phone);
+  const services = await servicesByPhone(phone);
   const pendingFeedback = services.filter((s) => s.status === "Completed" && !s.rating);
   const name = bookings[0]?.name ?? services[0]?.name;
 

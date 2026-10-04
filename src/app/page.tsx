@@ -7,9 +7,9 @@ import { recentReviews } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
-export default function Home() {
+export default async function Home() {
   const featured = BIKES.filter((b) => ["r15-v4", "r7", "mt-15"].includes(b.id));
-  const reviews = recentReviews(3);
+  const reviews = await recentReviews(3);
   return (
     <>
       {/* Hero */}

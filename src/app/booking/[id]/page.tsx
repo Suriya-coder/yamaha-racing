@@ -18,7 +18,7 @@ export default async function BookingPage({
 }) {
   const { id } = await params;
   const { new: isNew } = await searchParams;
-  const b = getBooking(id);
+  const b = await getBooking(id);
   if (!b) notFound();
   const bike = getBike(b.bike_id)!;
   const hex = bike.colors.find((c) => c.name === b.color)?.hex;

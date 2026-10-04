@@ -43,7 +43,7 @@ export async function bookBike(_: FormState, f: FormData): Promise<FormState> {
   if (data.address.length < 8) return { error: "Please enter your full delivery address." };
   if (!data.city) return { error: "Please enter your city." };
   if (!SHOWROOMS.includes(data.showroom)) return { error: "Please choose a showroom." };
-  const id = createBooking(data);
+  const id = await createBooking(data);
   redirect(`/booking/${id}?new=1`);
 }
 
@@ -67,7 +67,7 @@ export async function bookService(_: FormState, f: FormData): Promise<FormState>
   const today = new Date().toISOString().slice(0, 10);
   if (!data.date || data.date < today) return { error: "Please choose today or a future date." };
   if (!TIME_SLOTS.includes(data.slot)) return { error: "Please choose a time slot." };
-  const id = createService(data);
+  const id = await createService(data);
   redirect(`/service/${id}?new=1`);
 }
 
@@ -75,11 +75,11 @@ export async function lookup(_: FormState, f: FormData): Promise<FormState> {
   const q = str(f, "q").toUpperCase();
   if (!q) return { error: "Enter a booking ID, service ID or mobile number." };
   if (q.startsWith("YR-")) {
-    if (!getBooking(q)) return { error: `No booking found with ID ${q}.` };
+    if (!(await getBooking(q))) return { error: `No booking found with ID ${q}.` };
     redirect(`/booking/${q}`);
   }
   if (q.startsWith("SV-")) {
-    if (!getService(q)) return { error: `No service found with ID ${q}.` };
+    if (!(await getService(q))) return { error: `No service found with ID ${q}.` };
     redirect(`/service/${q}`);
   }
   const phone = q.replace(/\D/g, "").slice(-10);
@@ -92,10 +92,10 @@ export async function submitFeedback(_: FormState, f: FormData): Promise<FormSta
   const rating = Number(f.get("rating"));
   const liked = str(f, "liked") === "yes";
   const feedback = str(f, "feedback").slice(0, 500);
-  const s = getService(id);
+  const s = await getService(id);
   if (!s || s.status !== "Completed") return { error: "Feedback can only be given after the service is completed." };
   if (!(rating >= 1 && rating <= 5)) return { error: "Please select a star rating." };
-  saveFeedback(s.id, rating, liked, feedback);
+  await saveFeedback(s.id, rating, liked, feedback);
   revalidatePath(`/service/${s.id}`);
   revalidatePath("/");
   return { ok: "Thank you for your feedback!" };
@@ -116,7 +116,7 @@ export async function adminUpdateBooking(f: FormData) {
   if (!(await isAdmin())) return;
   const status = str(f, "status");
   if (!(BOOKING_STATUSES as readonly string[]).includes(status)) return;
-  updateBookingStatus(str(f, "id"), status, str(f, "note"), str(f, "expected") || undefined);
+  await updateBookingStatus(str(f, "id"), status, str(f, "note"), str(f, "expected") || undefined);
   revalidatePath("/admin");
 }
 
@@ -125,6 +125,6 @@ export async function adminUpdateService(f: FormData) {
   const status = str(f, "status");
   if (!(SERVICE_STATUSES as readonly string[]).includes(status)) return;
   const cost = str(f, "cost") ? Number(str(f, "cost")) : undefined;
-  updateServiceStatus(str(f, "id"), status, str(f, "note"), str(f, "work_done") || undefined, Number.isFinite(cost) ? cost : undefined);
+  await updateServiceStatus(str(f, "id"), status, str(f, "note"), str(f, "work_done") || undefined, Number.isFinite(cost) ? cost : undefined);
   revalidatePath("/admin");
 }

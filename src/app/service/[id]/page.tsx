@@ -17,7 +17,7 @@ export default async function ServiceStatus({
 }) {
   const { id } = await params;
   const { new: isNew } = await searchParams;
-  const s = getService(id);
+  const s = await getService(id);
   if (!s) notFound();
   const type = SERVICE_TYPES.find((t) => t.id === s.service_type);
   const done = s.status === "Completed";
