@@ -30,7 +30,7 @@ export default function Footer() {
         </div>
       </div>
       <p className="border-t border-line py-4 text-center text-xs text-gray-500">
-        Demo project for learning purpose.It was Built by Suriya.
+        Demo project for learning purpose. It was Built by Suriya.
       </p>
     </footer>
   );
