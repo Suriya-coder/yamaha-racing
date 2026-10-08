@@ -25,7 +25,7 @@ export default function Footer() {
         </div>
         <div>
           <p className="label">Contact</p>
-          <p className="text-sm text-gray-300">Mob: +91 81245 533940</p>
+          <p className="text-sm text-gray-300">Mob: +91 81245 33940</p>
           <p className="text-sm text-gray-300">Email: aasuriyaprakash@gmail.com</p>
         </div>
       </div>
